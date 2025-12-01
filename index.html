@@ -1,127 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Charity Connector Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1724; --card:#0b1220; --muted:#9aa5b1; --accent1:#6ee7b7; --accent2:#60a5fa; --glass: rgba(255,255,255,0.04);
+  --radius:14px; --maxw:1100px; font-family: 'Inter', sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;margin:0;background:linear-gradient(180deg,#071026 0%, #071a2a 60%);color:#e6eef6;}
+a{color:inherit;}
+.wrap{max-width:var(--maxw);margin:28px auto;padding:20px;}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.brand{display:flex;align-items:center;gap:12px;}
+.logo{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;color:#04263b;font-weight:800;font-size:18px;}
+.brand h1{margin:0;font-size:18px;}
+.nav{display:flex;gap:12px;align-items:center;}
+.btn{background:var(--glass);padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);cursor:pointer;transition:0.2s;}
+.btn.primary{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#04263b;font-weight:700;border:none;}
+.btn:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,0.3);}
+.hero{display:grid;grid-template-columns:1fr 420px;gap:28px;margin-top:20px;align-items:center;}
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);padding:22px;border-radius:var(--radius);backdrop-filter: blur(6px);border:1px solid rgba(255,255,255,0.03);}
+.headline{font-size:28px;line-height:1.05;margin:0 0 12px;}
+.sub{color:var(--muted);margin:0 0 18px;}
+.feature-list{display:flex;flex-wrap:wrap;gap:10px;}
+.chip{background:rgba(255,255,255,0.03);padding:8px 10px;border-radius:10px;font-size:13px;}
+.search{display:flex;gap:8px;margin-top:12px;}
+.search input{flex:1;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit;}
+.filters{display:flex;gap:8px;margin-top:16px;}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px;}
+.ngo{padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border:1px solid rgba(255,255,255,0.03);}
+.ngo h3{margin:0 0 6px;}
+.badge{display:inline-block;padding:6px 8px;border-radius:8px;font-size:12px;background:rgba(255,255,255,0.03);color:var(--accent1);}
+.progress{height:8px;background:rgba(255,255,255,0.03);border-radius:8px;overflow:hidden;margin-top:8px;}
+.progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent1));}
+.dashboard{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px;}
+.tile{padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border:1px solid rgba(255,255,255,0.03);}
+.metrics{display:flex;gap:12px;align-items:center;}
+footer{margin-top:28px;padding:14px;text-align:center;color:var(--muted);font-size:13px;}
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);background:rgba(2,6,23,0.6);opacity:0;pointer-events:none;transition:opacity .18s;}
+.modal.open{opacity:1;pointer-events:auto;}
+.modal-inner{width:420px;background:#021022;padding:18px;border-radius:14px;border:1px solid rgba(255,255,255,0.04);}
+.clickable{cursor:pointer;}
+.muted{color:var(--muted);}
+input[type=range]{width:100%;}
+@media (max-width:1000px){.hero{grid-template-columns:1fr;}.grid{grid-template-columns:repeat(2,1fr);}.dashboard{grid-template-columns:1fr;}}
+@media (max-width:640px){.wrap{padding:12px;}.grid{grid-template-columns:1fr;}.logo{width:44px;height:44px}.headline{font-size:22px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand">
+    <div class="logo">C</div>
+    <div><h1>Charity Connector Hub</h1><div class="muted" style="font-size:13px">Connect donors, volunteers & NGOs</div></div>
+  </div>
+  <nav class="nav">
+    <button class="btn">Sign in</button>
+    <button id="getStarted" class="btn primary">Get Started</button>
+  </nav>
+</header>
 
-  // NGO data with multiple countries worldwide
-  const NGOS = [
-    {id:1,name:'Clean Water Initiative',location:'Kolkata',country:'India',impact:86,desc:'Build community water filters and train local technicians.'},
-    {id:2,name:'Education Drive',location:'Maharashtra',country:'India',impact:41,desc:'Scholarships and teacher training for rural schools.'},
-    {id:3,name:'Rural Health Network',location:'Uttar Pradesh',country:'India',impact:67,desc:'Mobile health camps and maternal care.'},
-    {id:4,name:'Water For All',location:'Nairobi',country:'Kenya',impact:72,desc:'Community wells and clean water access.'},
-    {id:5,name:'Education Forward',location:'Lima',country:'Peru',impact:55,desc:'School infrastructure and teacher training.'},
-    {id:6,name:'Health on Wheels',location:'Manila',country:'Philippines',impact:65,desc:'Mobile health clinics and maternal care.'},
-    {id:7,name:'Green Seed Project',location:'Berlin',country:'Germany',impact:48,desc:'Urban gardening and sustainable farming.'},
-    {id:8,name:'Youth Skill Labs',location:'Toronto',country:'Canada',impact:49,desc:'Vocational training and placements for youth.'},
-    {id:9,name:'Meals For Many',location:'Sydney',country:'Australia',impact:93,desc:'Community kitchens and food distribution.'},
-    {id:10,name:'Clean Energy Now',location:'Cape Town',country:'South Africa',impact:77,desc:'Solar panels and renewable energy for communities.'},
-    {id:11,name:'Tech for Schools',location:'London',country:'UK',impact:60,desc:'Provide technology and internet access to schools.'},
-    {id:12,name:'Health Bridge',location:'New York',country:'USA',impact:82,desc:'Mobile clinics and healthcare education.'}
-  ];
+<main>
+<section class="hero">
+  <div class="card">
+    <h2 class="headline">Connect your cause to the people who care — smarter, faster, more transparent.</h2>
+    <p class="sub">Discover verified projects, donate, volunteer, and track real impact.</p>
+    <div class="search">
+      <input id="q" placeholder="Search projects, causes or locations">
+      <button id="searchBtn" class="btn">Search</button>
+    </div>
+    <div class="filters">
+      <div class="chip">High Impact</div>
+      <div class="chip">Verified NGOs</div>
+      <div class="chip">Near me</div>
+      <div class="chip">Low fee</div>
+    </div>
+    <div class="feature-list" style="margin-top:16px">
+      <div class="chip">Smart match</div>
+      <div class="chip">Real-time impact feed</div>
+      <div class="chip">Micro-donations</div>
+      <div class="chip">Volunteer scheduling</div>
+    </div>
+    <div style="margin-top:18px;display:flex;gap:10px">
+      <button id="donateNow" class="btn primary">Donate Now</button>
+      <button id="volunteer" class="btn">Volunteer</button>
+    </div>
+  </div>
 
-  const ngoGrid = document.getElementById('ngoGrid');
-
-  function renderByCountry() {
-    ngoGrid.innerHTML = '';
-    // group by country
-    const countries = [...new Set(NGOS.map(n => n.country))];
-    countries.forEach(country => {
-      const countryHeader = document.createElement('h3');
-      countryHeader.textContent = country;
-      countryHeader.style.marginTop = '20px';
-      ngoGrid.appendChild(countryHeader);
-
-      const countryNGOs = NGOS.filter(n => n.country === country);
-      countryNGOs.forEach(n => {
-        const div = document.createElement('div'); 
-        div.className = 'ngo';
-        div.innerHTML = `
-          <div style="display:flex;justify-content:space-between;align-items:start">
-            <div>
-              <h3>${n.name}</h3>
-              <div class="muted" style="font-size:13px">${n.location}</div>
-            </div>
-            <div>
-              <div class="badge">Verified</div>
-            </div>
-          </div>
-          <p class="muted" style="margin-top:8px;font-size:14px">${n.desc}</p>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-            <div style="width:60%">
-              <div class="progress" aria-hidden><i style="width:${n.impact}%"></i></div>
-              <div class="muted" style="font-size:12px;margin-top:6px">${n.impact}% funded</div>
-            </div>
-            <div style="text-align:right">
-              <button class="btn" onclick="openDonate(${n.id})">Donate</button>
-              <button class="btn" style="margin-left:6px" onclick="openProfile(${n.id})">View</button>
-            </div>
-          </div>
-        `;
-        ngoGrid.appendChild(div);
-      });
-    });
-  }
-
-  // initial render
-  renderByCountry();
-
-  // Search function
-  document.getElementById('searchBtn').addEventListener('click', () => {
-    const q = document.getElementById('q').value.trim().toLowerCase();
-    if (!q) return renderByCountry();
-    const res = NGOS.filter(n => (n.name + ' ' + n.desc + ' ' + n.location + ' ' + n.country).toLowerCase().includes(q));
-    ngoGrid.innerHTML = '';
-    res.forEach(n => {
-      const div = document.createElement('div'); 
-      div.className = 'ngo';
-      div.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:start">
-          <div>
-            <h3>${n.name}</h3>
-            <div class="muted" style="font-size:13px">${n.location}, ${n.country}</div>
-          </div>
-          <div>
-            <div class="badge">Verified</div>
-          </div>
+  <aside class="card">
+    <h3 style="margin-top:0">Quick Match</h3>
+    <div class="muted" style="font-size:13px">Projects you might like</div>
+    <div style="margin-top:12px">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+        <div style="width:56px;height:56px;border-radius:10px;background:linear-gradient(90deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:700;color:#04263b">WC</div>
+        <div>
+          <div style="font-weight:700">Clean Water Initiative</div>
+          <div class="muted" style="font-size:13px">Kolkata — 86% funded</div>
+          <div class="progress"><i style="width:86%"></i></div>
         </div>
-        <p class="muted" style="margin-top:8px;font-size:14px">${n.desc}</p>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-          <div style="width:60%">
-            <div class="progress" aria-hidden><i style="width:${n.impact}%"></i></div>
-            <div class="muted" style="font-size:12px;margin-top:6px">${n.impact}% funded</div>
-          </div>
-          <div style="text-align:right">
-            <button class="btn" onclick="openDonate(${n.id})">Donate</button>
-            <button class="btn" style="margin-left:6px" onclick="openProfile(${n.id})">View</button>
-          </div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <div style="width:56px;height:56px;border-radius:10px;background:linear-gradient(90deg,#fbbf24,#fb7185);display:flex;align-items:center;justify-content:center;font-weight:700;color:#04263b">ED</div>
+        <div>
+          <div style="font-weight:700">Education Drive</div>
+          <div class="muted" style="font-size:13px">Maharashtra — 41% funded</div>
+          <div class="progress"><i style="width:41%"></i></div>
         </div>
-      `;
-      ngoGrid.appendChild(div);
-    });
-  });
+      </div>
+    </div>
+  </aside>
+</section>
 
-  // Modal & toast functions remain unchanged
-  const donorModal = document.getElementById('donorModal');
-  function openDonate(id) {
-    const ngo = NGOS.find(x => x.id === id);
-    donorModal.querySelector('h3').textContent = 'Donate — ' + ngo.name;
-    donorModal.classList.add('open'); donorModal.setAttribute('aria-hidden','false');
-  }
-  document.getElementById('closeDon').addEventListener('click', () => {donorModal.classList.remove('open'); donorModal.setAttribute('aria-hidden','true');});
-  document.getElementById('donateNow').addEventListener('click', () => openDonate(NGOS[0].id));
-  document.getElementById('confirmDon').addEventListener('click', () => {
-    const amt = Number(document.getElementById('donAmt').value || 0);
-    if(amt < 1){ alert('Enter valid amount'); return; }
-    donorModal.classList.remove('open'); donorModal.setAttribute('aria-hidden','true');
-    showToast(`Thank you! Donation of ₹${amt} recorded.`);
+<section style="margin-top:22px">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <h3 style="margin:0">Featured Projects</h3>
+    <div class="muted">Best matches for you</div>
+  </div>
+  <div class="grid" id="ngoGrid" aria-live="polite"></div>
+
+  <div class="dashboard" style="margin-top:18px">
+    <div class="tile">
+      <h4>Platform Metrics</h4>
+      <div class="metrics" style="margin-top:12px">
+        <div style="flex:1"><div style="font-size:28px;font-weight:700">₹4.2M</div><div class="muted">Total donations</div></div>
+        <div style="flex:1"><div style="font-size:28px;font-weight:700">1,284</div><div class="muted">Active volunteers</div></div>
+      </div>
+    </div>
+    <div class="tile">
+      <h4>Recent Activity</h4>
+      <ul style="margin:10px 0 0;padding-left:16px;color:var(--muted)">
+        <li>₹2,000 donated to Clean Water Initiative</li>
+        <li>Volunteer shift booked — Education Drive</li>
+        <li>NGO verified — Rural Health Network</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div id="donorModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal-inner">
+    <h3 style="margin-top:0">Donate — Quick Checkout</h3>
+    <div class="muted" style="font-size:13px">Secure demo payment (no real payment).</div>
+    <form id="donForm" style="margin-top:12px">
+      <label class="muted">Amount (₹)</label>
+      <input id="donAmt" type="number" min="50" value="500" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;margin-top:6px">
+      <label class="muted" style="margin-top:8px;display:block">Message (optional)</label>
+      <textarea id="donMsg" rows="3" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;margin-top:6px"></textarea>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button type="button" id="confirmDon" class="btn primary">Confirm</button>
+        <button type="button" id="closeDon" class="btn">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<footer>Built with ❤️ — Charity Connector Hub • Demo UI • For production: integrate payments, verification & APIs.</footer>
+</div>
+
+<script>
+const NGOS = [
+  {id:1,name:'Clean Water Initiative',location:'Kolkata',impact:86,desc:'Build community water filters and train local technicians.'},
+  {id:2,name:'Education Drive',location:'Maharashtra',impact:41,desc:'Scholarships and teacher training for rural schools.'},
+  {id:3,name:'Rural Health Network',location:'Uttar Pradesh',impact:67,desc:'Mobile health camps and maternal care.'},
+  {id:4,name:'Green Seed Project',location:'Kerala',impact:22,desc:'Afforestation and sustainable farming support.'},
+  {id:5,name:'Youth Skill Labs',location:'Bengaluru',impact:49,desc:'Vocational training and placements for youth.'},
+  {id:6,name:'Meals For Many',location:'Hyderabad',impact:93,desc:'Community kitchens and food distribution.'}
+];
+const ngoGrid = document.getElementById('ngoGrid');
+function renderGrid(items){
+  ngoGrid.innerHTML = '';
+  items.forEach(n=>{
+    const div = document.createElement('div'); div.className='ngo';
+    div.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:start">
+        <div><h3>${n.name}</h3><div class="muted" style="font-size:13px">${n.location}</div></div>
+        <div><div class="badge">Verified</div></div>
+      </div>
+      <p class="muted" style="margin-top:8px;font-size:14px">${n.desc}</p>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+        <div style="width:60%">
+          <div class="progress"><i style="width:${n.impact}%"></i></div>
+          <div class="muted" style="font-size:12px;margin-top:6px">${n.impact}% funded</div>
+        </div>
+        <div style="text-align:right">
+          <button class="btn" onclick="openDonate(${n.id})">Donate</button>
+          <button class="btn" style="margin-left:6px" onclick="openProfile(${n.id})">View</button>
+        </div>
+      </div>
+    `;
+    ngoGrid.appendChild(div);
   });
-  function showToast(text){
-    const el = document.createElement('div');
-    el.style.position='fixed'; el.style.right='18px'; el.style.bottom='18px'; el.style.background='linear-gradient(90deg,var(--accent2),var(--accent1))'; el.style.color='#04263b'; el.style.padding='10px 14px'; el.style.borderRadius='12px'; el.style.fontWeight='700'; el.style.boxShadow='0 8px 30px rgba(2,6,23,0.6)'; el.textContent=text;
-    document.body.appendChild(el);
-    setTimeout(()=>{ el.style.transition='opacity .6s'; el.style.opacity='0'; setTimeout(()=>el.remove(),700); },2800);
-  }
-  function openProfile(id){ const ngo = NGOS.find(x=>x.id===id); alert(`${ngo.name}\n\n${ngo.desc}\n\nLocation: ${ngo.location}, ${ngo.country}\nImpact: ${ngo.impact}%`); }
-  window.addEventListener('keydown', e=>{ if(e.key==='Escape'){ donorModal.classList.remove('open'); donorModal.setAttribute('aria-hidden','true'); } });
-  document.getElementById('getStarted').addEventListener('click', ()=>{ document.getElementById('volunteer').click(); });
-  document.getElementById('volunteer').addEventListener('click', ()=>{
-    const name = prompt('Quick Volunteer Sign-up — name?');
-    if(name) showToast('Thanks ' + name + '! We sent next steps to your email (demo).');
-  });
+}
+renderGrid(NGOS);
+
+document.getElementById('searchBtn').addEventListener('click', ()=>{
+  const q = document.getElementById('q').value.trim().toLowerCase();
+  if(!q) return renderGrid(NGOS);
+  const res = NGOS.filter(n=>(n.name+' '+n.desc+' '+n.location).toLowerCase().includes(q));
+  renderGrid(res);
+});
+
+const donorModal = document.getElementById('donorModal');
+function openDonate(id){
+  const ngo = NGOS.find(x=>x.id===id);
+  donorModal.querySelector('h3').textContent = 'Donate — ' + ngo.name;
+  donorModal.classList.add('open'); donorModal.setAttribute('aria-hidden','false');
+}
+document.getElementById('closeDon').addEventListener('click', ()=>{donorModal.classList.remove('open'); donorModal.setAttribute('aria-hidden','true');});
+document.getElementById('donateNow').addEventListener('click', ()=> openDonate(NGOS[0].id));
+document.getElementById('confirmDon').addEventListener('click', ()=>{
+  const amt = Number(document.getElementById('donAmt').value || 0);
+  if(amt < 1){ alert('Please enter an amount'); return; }
+  donorModal.classList.remove('open'); donorModal.setAttribute('aria-hidden','true');
+  showToast('Thank you! Donation of ₹' + amt + ' recorded.');
+});
+
+function showToast(text){
+  const el = document.createElement('div');
+  el.style.position='fixed';el.style.right='18px';el.style.bottom='18px';
+  el.style.background='linear-gradient(90deg,var(--accent2),var(--accent1))';
+  el.style.color='#04263b';el.style.padding='10px 14px';el.style.borderRadius='12px';
+  el.style.fontWeight='700';el.style.boxShadow='0 8px 30px rgba(2,6,23,0.6)';
+  el.textContent=text;
+  document.body.appendChild(el);
+  setTimeout(()=>{ el.style.transition='opacity .6s'; el.style.opacity='0'; setTimeout(()=>el.remove(),700); },2800);
+}
+
+function openProfile(id){
+  const ngo = NGOS.find(x=>x.id===id);
+  alert(ngo.name + '\n\n' + ngo.desc + '\n\nLocation: ' + ngo.location + '\nImpact: ' + ngo.impact + '%');
+}
+
+window.addEventListener('keydown', e=>{ if(e.key==='Escape'){ donorModal.classList.remove('open'); donorModal.setAttribute('aria-hidden','true'); } });
+
+document.getElementById('getStarted').addEventListener('click', ()=>{ document.getElementById('volunteer').click(); });
+document.getElementById('volunteer').addEventListener('click', ()=>{
+  const name = prompt('Quick Volunteer Sign-up — name?');
+  if(name) showToast('Thanks ' + name + '! We sent next steps to your email (demo).');
+});
 </script>
+</body>
+</html>
