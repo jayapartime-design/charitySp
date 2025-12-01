@@ -3,51 +3,146 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Charity Connector Hub - Web</title>
+<title>Charity Connector Hub</title>
 <style>
-body{font-family:sans-serif;background:#0f1724;color:#e6eef6;margin:0;padding:0;}
-.wrap{max-width:900px;margin:20px auto;padding:20px;background:#0b1220;border-radius:12px;}
-h1{text-align:center;}
-.ngo{padding:12px;border:1px solid #333;border-radius:10px;margin-bottom:10px;}
-button{padding:6px 10px;margin:2px;border-radius:6px;border:none;cursor:pointer;}
-input{padding:6px;width:200px;margin-right:8px;border-radius:6px;border:1px solid #555;background:#021022;color:#fff;}
-.progress{height:10px;background:#333;border-radius:6px;margin-top:6px;overflow:hidden;}
-.progress>div{height:100%;background:#6ee7b7;}
+:root {
+  --primary:#0f1724;
+  --card-bg:#0b1220;
+  --accent1:#6ee7b7;
+  --accent2:#60a5fa;
+  --text:#e6eef6;
+  --muted:#a0aec0;
+}
+body{margin:0;font-family:'Inter',sans-serif;background:var(--primary);color:var(--text);}
+header{padding:20px;text-align:center;}
+h1{margin:0;font-size:28px;}
+.search-container{display:flex;justify-content:center;margin:20px;}
+input, button{padding:10px 14px;font-size:14px;border-radius:8px;border:none;}
+input{width:250px;margin-right:10px;}
+button{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#04263b;font-weight:700;cursor:pointer;transition:transform .2s;}
+button:hover{transform:translateY(-3px);}
+#ngoGrid{max-width:1000px;margin:0 auto;padding:10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
+.ngo{background:var(--card-bg);padding:16px;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,0.4);}
+.ngo h3{margin:0;}
+.muted{color:var(--muted);}
+.progress{height:10px;background:#333;border-radius:6px;margin-top:8px;overflow:hidden;}
+.progress i{display:block;height:100%;background:var(--accent1);}
+.btn{padding:6px 10px;border-radius:8px;border:none;background:var(--accent2);color:#04263b;font-weight:600;margin-left:4px;cursor:pointer;transition:all .2s;}
+.btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.3);}
+h2.country-header{grid-column:1/-1;margin-top:20px;color:var(--accent1);}
+.modal, .toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--card-bg);padding:20px;border-radius:14px;display:none;box-shadow:0 6px 30px rgba(0,0,0,0.6);}
+.modal.open{display:block;}
+.toast{top:auto;bottom:20px;right:20px;transform:none;transition:opacity .6s;}
 </style>
 </head>
 <body>
-<div class="wrap">
+
+<header>
 <h1>Charity Connector Hub</h1>
-<input id="search" placeholder="Search NGO">
-<button onclick="renderGrid()">Search</button>
-<div id="grid"></div>
+</header>
+
+<div class="search-container">
+<input type="text" id="q" placeholder="Search NGOs by name, location, or country">
+<button id="searchBtn">Search</button>
+</div>
+
+<div id="ngoGrid"></div>
+
+<!-- Donation Modal -->
+<div id="donorModal" class="modal" aria-hidden="true">
+  <h3>Donate</h3>
+  <input type="number" id="donAmt" placeholder="Enter amount">
+  <button id="confirmDon">Donate Now</button>
+  <button id="closeDon">Cancel</button>
 </div>
 
 <script>
-const NGOS=[
-  {id:1,name:'Clean Water Initiative',location:'Kolkata',impact:86},
-  {id:2,name:'Education Drive',location:'Maharashtra',impact:41},
-  {id:3,name:'Rural Health Network',location:'UP',impact:67}
+const NGOS = [
+  {id:1,name:'Clean Water Initiative',location:'Kolkata',country:'India',impact:86,desc:'Build community water filters and train local technicians.'},
+  {id:2,name:'Education Drive',location:'Maharashtra',country:'India',impact:41,desc:'Scholarships and teacher training for rural schools.'},
+  {id:3,name:'Rural Health Network',location:'Uttar Pradesh',country:'India',impact:67,desc:'Mobile health camps and maternal care.'},
+  {id:4,name:'Water For All',location:'Nairobi',country:'Kenya',impact:72,desc:'Community wells and clean water access.'},
+  {id:5,name:'Education Forward',location:'Lima',country:'Peru',impact:55,desc:'School infrastructure and teacher training.'},
+  {id:6,name:'Health on Wheels',location:'Manila',country:'Philippines',impact:65,desc:'Mobile health clinics and maternal care.'},
+  {id:7,name:'Green Seed Project',location:'Berlin',country:'Germany',impact:48,desc:'Urban gardening and sustainable farming.'},
+  {id:8,name:'Youth Skill Labs',location:'Toronto',country:'Canada',impact:49,desc:'Vocational training and placements for youth.'},
+  {id:9,name:'Meals For Many',location:'Sydney',country:'Australia',impact:93,desc:'Community kitchens and food distribution.'},
+  {id:10,name:'Clean Energy Now',location:'Cape Town',country:'South Africa',impact:77,desc:'Solar panels and renewable energy for communities.'},
+  {id:11,name:'Tech for Schools',location:'London',country:'UK',impact:60,desc:'Provide technology and internet access to schools.'},
+  {id:12,name:'Health Bridge',location:'New York',country:'USA',impact:82,desc:'Mobile clinics and healthcare education.'}
 ];
 
-function renderGrid(){
-  const q=document.getElementById('search').value.toLowerCase();
-  const filtered=NGOS.filter(n=>n.name.toLowerCase().includes(q)||n.location.toLowerCase().includes(q));
-  const grid=document.getElementById('grid');
-  grid.innerHTML='';
-  filtered.forEach(n=>{
-    const div=document.createElement('div'); div.className='ngo';
-    div.innerHTML=`<strong>${n.name}</strong> - ${n.location}<div class="progress"><div style="width:${n.impact}%"></div></div>
-    <button onclick="donate(${n.id})">Donate</button>`;
-    grid.appendChild(div);
+const ngoGrid = document.getElementById('ngoGrid');
+const donorModal = document.getElementById('donorModal');
+let currentDonateId = null;
+
+function renderNGOs(list=NGOS){
+  ngoGrid.innerHTML = '';
+  const countries = [...new Set(list.map(n=>n.country))];
+  countries.forEach(c=>{
+    const header = document.createElement('h2');
+    header.className='country-header';
+    header.textContent = c;
+    ngoGrid.appendChild(header);
+
+    list.filter(n=>n.country===c).forEach(n=>{
+      const div=document.createElement('div'); div.className='ngo';
+      div.innerHTML=`
+        <h3>${n.name}</h3>
+        <div class="muted">${n.location}</div>
+        <p class="muted">${n.desc}</p>
+        <div class="progress"><i style="width:${n.impact}%"></i></div>
+        <div class="muted" style="font-size:12px;margin-top:4px">${n.impact}% funded</div>
+        <div style="margin-top:8px;text-align:right">
+          <button class="btn" onclick="openDonate(${n.id})">Donate</button>
+          <button class="btn" onclick="viewProfile(${n.id})">View</button>
+        </div>
+      `;
+      ngoGrid.appendChild(div);
+    });
   });
 }
-renderGrid();
 
-function donate(id){
-  const amt=prompt('Enter donation amount for NGO ID '+id);
-  if(amt) alert('Thank you for donating ₹'+amt);
+function openDonate(id){
+  currentDonateId = id;
+  donorModal.querySelector('h3').textContent='Donate — ' + NGOS.find(n=>n.id===id).name;
+  donorModal.classList.add('open');
+  donorModal.setAttribute('aria-hidden','false');
 }
+
+function closeDonate(){ donorModal.classList.remove('open'); donorModal.setAttribute('aria-hidden','true'); }
+
+document.getElementById('closeDon').addEventListener('click', closeDonate);
+document.getElementById('confirmDon').addEventListener('click',()=>{
+  const amt=Number(document.getElementById('donAmt').value||0);
+  if(amt<1){ alert('Enter a valid amount'); return; }
+  showToast(`Thank you! Donation of ₹${amt} recorded for ${NGOS.find(n=>n.id===currentDonateId).name}`);
+  closeDonate();
+});
+
+function showToast(msg){
+  const el=document.createElement('div');
+  el.className='toast'; el.textContent=msg;
+  el.style.display='block';
+  document.body.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; setTimeout(()=>el.remove(),600); },3000);
+}
+
+function viewProfile(id){
+  const ngo=NGOS.find(n=>n.id===id);
+  alert(`${ngo.name}\n\n${ngo.desc}\nLocation: ${ngo.location}, ${ngo.country}\nImpact: ${ngo.impact}%`);
+}
+
+// Search functionality
+document.getElementById('searchBtn').addEventListener('click',()=>{
+  const q=document.getElementById('q').value.toLowerCase().trim();
+  if(!q) return renderNGOs();
+  const filtered = NGOS.filter(n=>(n.name+' '+n.desc+' '+n.location+' '+n.country).toLowerCase().includes(q));
+  renderNGOs(filtered);
+});
+
+// Initial render
+renderNGOs();
 </script>
 </body>
 </html>
