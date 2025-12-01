@@ -100,7 +100,7 @@
   const donorModal = document.getElementById('donorModal');
   function openDonate(id) {
     const ngo = NGOS.find(x => x.id === id);
-    donorModal.querySelector('h3').textContent = 'Donate â ' + ngo.name;
+    donorModal.querySelector('h3').textContent = 'Donate — ' + ngo.name;
     donorModal.classList.add('open'); donorModal.setAttribute('aria-hidden','false');
   }
   document.getElementById('closeDon').addEventListener('click', () => {donorModal.classList.remove('open'); donorModal.setAttribute('aria-hidden','true');});
@@ -109,7 +109,7 @@
     const amt = Number(document.getElementById('donAmt').value || 0);
     if(amt < 1){ alert('Enter valid amount'); return; }
     donorModal.classList.remove('open'); donorModal.setAttribute('aria-hidden','true');
-    showToast(`Thank you! Donation of â¹${amt} recorded.`);
+    showToast(`Thank you! Donation of ₹${amt} recorded.`);
   });
   function showToast(text){
     const el = document.createElement('div');
@@ -121,7 +121,7 @@
   window.addEventListener('keydown', e=>{ if(e.key==='Escape'){ donorModal.classList.remove('open'); donorModal.setAttribute('aria-hidden','true'); } });
   document.getElementById('getStarted').addEventListener('click', ()=>{ document.getElementById('volunteer').click(); });
   document.getElementById('volunteer').addEventListener('click', ()=>{
-    const name = prompt('Quick Volunteer Sign-up â name?');
+    const name = prompt('Quick Volunteer Sign-up — name?');
     if(name) showToast('Thanks ' + name + '! We sent next steps to your email (demo).');
   });
 </script>
